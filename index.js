@@ -1,6 +1,17 @@
 const customExpress = require('./config/customExpress');
-const app = customExpress();
+const connection = require('./infrastructure/connection');
+const Tabelas = require('./infrastructure/tables');
 
-app.listen(3000, () => {
-    console.log("Servidor rodando em localhost:3000")
+connection.connect((erro) => {
+    if(erro) {
+        console.log(erro);
+    } else {
+        console.log('Conectado com o banco de dados"');
+        Tabelas.init(connection);
+        const app = customExpress();
+
+        app.listen(3000, () => {
+            console.log("Servidor rodando em http://localhost:3000");
+        });
+    }
 });
