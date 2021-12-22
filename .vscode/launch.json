@@ -9,9 +9,9 @@
         ""
       ],
       "stopAtEntry": false,
-      "cwd": "c:/Users/wilso/Documents/nodejs-api-rest/controllers",
+      "cwd": "c:/Users/wilso/Documents/nodejs-api-rest",
       "environment": [],
-      "program": "c:/Users/wilso/Documents/nodejs-api-rest/controllers/build/Debug/outDebug",
+      "program": "c:/Users/wilso/Documents/nodejs-api-rest/build/Debug/outDebug",
       "internalConsoleOptions": "openOnSessionStart",
       "MIMode": "gdb",
       "miDebuggerPath": "C:/MinGW/bin/gdb.exe",
