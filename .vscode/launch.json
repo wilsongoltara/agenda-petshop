@@ -2,27 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "cppdbg",
-      "request": "launch",
-      "args": [
-        ""
+      "name": "Debug Nodemon",
+      "processId": "${command:PickProcess}",
+      "request": "attach",
+      "protocol": "inspector",
+      "skipFiles": [
+        "<node_internals>/**"
       ],
-      "stopAtEntry": false,
-      "cwd": "c:/Users/wilso/Documents/nodejs-api-rest",
-      "environment": [],
-      "program": "c:/Users/wilso/Documents/nodejs-api-rest/build/Debug/outDebug",
-      "internalConsoleOptions": "openOnSessionStart",
-      "MIMode": "gdb",
-      "miDebuggerPath": "C:/MinGW/bin/gdb.exe",
-      "externalConsole": false,
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
+      "type": "pwa-node",
+      "restart": true
     }
+
   ]
 }
