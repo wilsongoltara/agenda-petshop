@@ -9,6 +9,7 @@ connection.connect((error) => {
         console.log('Conectado com o banco de dados');
         Tabelas.init(connection);
         const app = customExpress();
+
         const port = 3000;
         app.listen(port, () => {
             console.log(`Servidor rodando em http://localhost:${port}`);
