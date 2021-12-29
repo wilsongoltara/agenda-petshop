@@ -14,6 +14,7 @@
   "author": "Wilson Goltara",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.24.0",
     "body-parser": "^1.19.1",
     "consign": "^0.1.6",
     "express": "^4.17.2",

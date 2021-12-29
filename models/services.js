@@ -1,12 +1,13 @@
 const moment = require('moment');
+const axios = require('axios');
 const connection = require('../infrastructure/connection');
 
 class Sevice {
     add(service, res) {
-        const dateCreation = moment().format('YYYY-MM-DD HH:mm:ss');
-        const date = moment(service.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss');
+        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
+        const data = moment(service.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss');
         
-        const validDate = moment(date).isSameOrAfter(dateCreation);
+        const validDate = moment(data).isSameOrAfter(dataCriacao);
         const validClient = (service.cliente.length >= 5);
         
         const validations = [
@@ -28,14 +29,14 @@ class Sevice {
         if(thereAreErrors) {
             res.status(400).json(erros);
         } else {
-            const datedService = {...service, dateCreation, date};
+            const datedService = {...service, dataCriacao, data};
             const query = 'INSERT INTO atendimentos SET ?';
 
             connection.query(query, datedService, (error) => {
                 if(error) {
                     res.status(400).json(error);
                 } else {
-                    res.status(201).json(service);
+                    res.status(200).json(service);
                 }
             });
         }
@@ -53,15 +54,19 @@ class Sevice {
         });
     }
 
-    searchID(id, res) {
+    searchId(id, res) {
         const query = `SELECT * FROM atendimentos WHERE id=${id};`;
-        
-        connection.query(query, (error, results) => {
+
+        connection.query(query, async (error, results) => {
             const service = results[0];
-            
+            const cpf = service.cliente;
+
             if(error) {
                 res.status(400).json(error);
             } else {
+                const { data } = await axios.get(`http://localhost:8082/${cpf}`);
+                console.log(data);
+                service.cliente = data;
                 res.status(200).json(service);
             }
         });
