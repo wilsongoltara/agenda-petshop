@@ -1,6 +1,6 @@
 const moment = require('moment');
 const axios = require('axios');
-const connection = require('../infrastructure/connection');
+const connection = require('../infrastructure/database/connection');
 
 class Sevice {
     add(service, res) {
@@ -64,8 +64,7 @@ class Sevice {
             if(error) {
                 res.status(400).json(error);
             } else {
-                const { data } = await axios.get(`http://localhost:8082/${cpf}`);
-                console.log(data);
+                const { data } = await axios.get(`http://localhost:8082/${cpf}`); 
                 service.cliente = data;
                 res.status(200).json(service);
             }

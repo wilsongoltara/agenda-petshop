@@ -14,7 +14,7 @@ module.exports = (app) => {
     app.post('/atendimentos',(req, res) => {
         const service = req.body;
         
-        Sevice.add(service, res);
+        Sevice.add (service, res);
     });
 
     app.patch('/atendimentos/:id', (req, res) => {
