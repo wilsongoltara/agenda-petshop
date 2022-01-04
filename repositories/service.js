@@ -16,6 +16,15 @@ class Service {
         return query(sql);
     }
 
+    alter(values, id) {
+        const sql = `UPDATE atendimentos SET ? WHERE id=${id}`;
+        return query(sql, values);
+    }
+
+    delete(id) {
+        const sql = `DELETE FROM atendimentos WHERE id=${id}`;
+        return query(sql);
+    }
 }
 
 module.exports = new Service;

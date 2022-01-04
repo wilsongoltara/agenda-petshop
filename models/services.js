@@ -2,13 +2,14 @@ const moment = require('moment');
 const axios = require('axios');
 const connection = require('../infrastructure/database/connection');
 const respositories = require('../repositories/service');
+const res = require('express/lib/response');
 
 class Sevice {
     constructor() {
         this.validDate = ({ data, dataCriacao }) => moment(data).isSameOrAfter(dataCriacao);
-        this.validClient = (size) => (size >= 5);
+        this.validClient = tamanho => tamanho >= 5;
 
-        this.valided = parameters => this.validations.filter((field) => {
+        this.valided = (parameters) => this.validations.filter((field) => {
             const { nome } = field;
             const parameter = parameters[nome];
 
@@ -29,7 +30,6 @@ class Sevice {
         ];
     }
 
-    //Completed
     add(service) {
         const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
         const data = moment(service.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss');
@@ -38,11 +38,11 @@ class Sevice {
             data: { data, dataCriacao },
             cliente: { tamanho: service.cliente.length }
         }
-
+        
         const errors = this.valided(parameters)
         const thereAreErrors = errors.length;
 
-        if(thereAreErrors) {
+        if(!thereAreErrors) {
             return new Promise((_, reject) => reject(errors));
         } else {
             const datedService = { ...service, dataCriacao, data };
@@ -54,11 +54,11 @@ class Sevice {
                 });
         }
     }
-    //Completed
+    
     list() {
         return respositories.list();
     }
-    //Completed
+    
     searchId(id) {
         return respositories.searchId(id)
             .then(async(results) => {
@@ -72,34 +72,34 @@ class Sevice {
             })
     }
 
-    //TODO refactoring used repositories in alter and delete
-
-    alter(id, values, res) {
+    alter(id, values) {
+        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
         if(values.data) {
             values.data = moment(values.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss');
         }
-        
-        const query = 'UPDATE atendimentos SET ? WHERE id= ?';
 
-        connection.query(query, [values, id], (error) => {
-            if(error) {
-                res.status(400).json(error);
-            } else {
-                res.status(200).json({...values, id});
-            }
-        });
+        const parameters = {
+            data: { data: values.data, dataCriacao },
+            cliente: { tamanho: values.cliente.length }
+        }
+        const errors = this.valided(parameters);
+        const thereAreErrors = errors.length;
+        
+        if(!thereAreErrors) {
+            return new Promise((_, reject) => reject(errors));
+        } else {
+            return respositories.alter(values, id)
+                .then(() => {
+                    return { ...values, id };
+                }); 
+        }
     }
 
-    delete(id, res) {
-        const query = 'DELETE FROM atendimentos WHERE id=?';
-
-        connection.query(query, id, (error) => {
-            if(error) {
-                res.status(400).json(error);
-            } else {
-                res.status(200).json({id});
-            }
-        });
+    delete(id) {
+        return respositories.delete(id)
+            .then(() => {
+                return ({ id });
+            });
     }
 }
  

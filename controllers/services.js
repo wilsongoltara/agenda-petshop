@@ -26,12 +26,16 @@ module.exports = (app) => {
         const id = parseInt(req.params.id);
         const values = req.body;
         
-        Sevice.alter(id, values, res);
+        Sevice.alter(id, values)
+            .then((alteredService) => res.json(alteredService))
+            .catch((errors) => res.status(400).json(errors));
     });
 
     app.delete('/atendimentos/:id', (req, res) => {
         const id = parseInt(req.params.id);
 
-        Sevice.delete(id, res);
+        Sevice.delete(id)
+            .then((DeletedId) => res.json(DeletedId))
+            .catch((errors) => res.status(400).json(errors));
     });
 }
