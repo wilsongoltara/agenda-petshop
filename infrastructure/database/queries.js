@@ -11,3 +11,5 @@ const executeQuery = (query, parameters = '') => {
         });
     });
 };
+
+module.exports = executeQuery;

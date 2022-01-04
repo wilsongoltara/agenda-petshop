@@ -1,75 +1,78 @@
 const moment = require('moment');
 const axios = require('axios');
 const connection = require('../infrastructure/database/connection');
+const respositories = require('../repositories/service');
 
 class Sevice {
-    add(service, res) {
-        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
-        const data = moment(service.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss');
+    constructor() {
+        this.validDate = ({ data, dataCriacao }) => moment(data).isSameOrAfter(dataCriacao);
+        this.validClient = (size) => (size >= 5);
+
+        this.valided = parameters => this.validations.filter((field) => {
+            const { nome } = field;
+            const parameter = parameters[nome];
+
+            return !field.valido(parameter);
+        });
         
-        const validDate = moment(data).isSameOrAfter(dataCriacao);
-        const validClient = (service.cliente.length >= 5);
-        
-        const validations = [
+        this.validations = [
             {
                 nome: 'data',
-                valido: validDate,
+                valido: this.validDate,
                 msg: 'Data deve ser maior ou igual a data atual.'
             },
             {
                 nome: 'cliente',
-                valido: validClient,
+                valido: this.validClient,
                 msg: 'Nome do cliente deve ter mais de 5 caractéres.'
             }
         ];
+    }
 
-        const errors = validations.filter(field => !field.valido);
+    //Completed
+    add(service) {
+        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss');
+        const data = moment(service.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss');
+        
+        const parameters = {
+            data: { data, dataCriacao },
+            cliente: { tamanho: service.cliente.length }
+        }
+
+        const errors = this.valided(parameters)
         const thereAreErrors = errors.length;
 
         if(thereAreErrors) {
-            res.status(400).json(erros);
+            return new Promise((_, reject) => reject(errors));
         } else {
-            const datedService = {...service, dataCriacao, data};
-            const query = 'INSERT INTO atendimentos SET ?';
+            const datedService = { ...service, dataCriacao, data };
 
-            connection.query(query, datedService, (error) => {
-                if(error) {
-                    res.status(400).json(error);
-                } else {
-                    res.status(200).json(service);
-                }
-            });
+            return respositories.add(datedService)
+                .then((results) => {
+                    const id = results.insertId;
+                    return ({ ...service, id });
+                });
         }
     }
-
-    list(res) {
-        const query = 'SELECT * FROM atendimentos;';
-
-        connection.query(query, (error, results) => {
-            if(error) {
-                res.status(400).json(error);
-            } else {
-                res.status(200).json(results);
-            }
-        });
+    //Completed
+    list() {
+        return respositories.list();
+    }
+    //Completed
+    searchId(id) {
+        return respositories.searchId(id)
+            .then(async(results) => {
+                const atendimento = results[0];
+                const cpf = atendimento.cliente;
+                const { data } = await axios.get(`http://localhost:8082/${cpf}`);
+                
+                atendimento.cliente = data;
+                
+                return atendimento;
+            })
     }
 
-    searchId(id, res) {
-        const query = `SELECT * FROM atendimentos WHERE id=${id};`;
-
-        connection.query(query, async (error, results) => {
-            const service = results[0];
-            const cpf = service.cliente;
-
-            if(error) {
-                res.status(400).json(error);
-            } else {
-                const { data } = await axios.get(`http://localhost:8082/${cpf}`); 
-                service.cliente = data;
-                res.status(200).json(service);
-            }
-        });
-    }
+    //TODO refactoring used repositories in alter and delete
 
     alter(id, values, res) {
         if(values.data) {

@@ -2,19 +2,24 @@ const Sevice = require('../models/services');
 
 module.exports = (app) => {
     app.get('/atendimentos', (_, res) => {
-        Sevice.list(res);
+        Sevice.list()
+            .then((results) => res.json(results))
+            .catch((errors) => res.status(400).json(errors));
     });
 
     app.get('/atendimentos/:id', (req , res) => {
         const id = parseInt(req.params.id);
-
-        Sevice.searchId(id, res);
+        Sevice.searchId(id)
+            .then((results) => res.json(results))
+            .catch((errors) => res.status(400).json(errors));
     });
 
+    //Completed
     app.post('/atendimentos',(req, res) => {
         const service = req.body;
-        
-        Sevice.add (service, res);
+        Sevice.add(service)
+            .then((registeredService) => res.status(201).json(registeredService))
+            .catch((errors) => res.status(400).json(errors));
     });
 
     app.patch('/atendimentos/:id', (req, res) => {
