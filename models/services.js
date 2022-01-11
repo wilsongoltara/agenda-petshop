@@ -2,7 +2,6 @@ const moment = require('moment');
 const axios = require('axios');
 const connection = require('../infrastructure/database/connection');
 const respositories = require('../repositories/service');
-const res = require('express/lib/response');
 
 class Sevice {
     constructor() {
@@ -58,7 +57,7 @@ class Sevice {
     list() {
         return respositories.list();
     }
-    
+
     searchId(id) {
         return respositories.searchId(id)
             .then(async(results) => {
@@ -98,7 +97,7 @@ class Sevice {
     delete(id) {
         return respositories.delete(id)
             .then(() => {
-                return ({ id });
+                return ({ id: id, msg: "Deleted!" });
             });
     }
 }
